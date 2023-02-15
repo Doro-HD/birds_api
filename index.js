@@ -1,41 +1,58 @@
-const { v4: uuidv4 } = require('uuid')
-
 const express = require('express')
 const app = express()
 
-const uuid1 = uuidv4()
-const uuid2 = uuidv4()
-const uuid3 = uuidv4()
-const uuid4 = uuidv4()
-
-const birdsDB = {
-  uuid1: {
+const birdsDB = [
+  {
+    id: '1',
     name: 'Aquatic warbler',
     scientificName: 'Acrocephalus paludicola',
     birdFamily: 'Warblers',
     wingSpand: 16.5
   },
-  uuid2: {
+  {
+    id: '2',
     name: 'Segde warbler',
     scientificName: 'Acrocephalus schoenobaenus',
     birdFamily: 'Warblers',
     wingSpand: 17    
   },
-  uuid3: {
+  {
+    id: '3',
     name: 'Arctic skua',
     scientificName: 'Stercorarius parasiticus',
     birdFamily: 'Skuas',
     wingSpand: 110
-    
   },
-  uuid4: {
+  {
+    id: '4',
     name: 'Long-tailed skua',
     scientificName: 'Stercorarius longicaudus',
     birdFamily: 'Skuas',
     wingSpand: 105
-    
   }
-}
+]
 
+app.get('/birds', (req, res) => {
+  const birdFamily = req.query.birdFamily
+  let birds = birdsDB
+  
+  if (birdFamily) {
+    birds = birds.filter(bird => bird.birdFamily === birdFamily)
+  }
+  
+  res.send(birds)
+})
+
+app.get('/birds/:id', (req, res) => {
+  const id = req.params.id
+  const bird = birdsDB.find(bird => bird.id === id)  
+
+  let status = 200
+  if (bird === undefined) {
+    status = 404
+  }
+  
+  res.status(status).send(bird)
+})
 
 app.listen(8080)
