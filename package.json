@@ -1,0 +1,11 @@
+{
+  "name": "birds_api",
+  "version": "1.0.0",
+  "description": "An bird centric api",
+  "dependencies": {
+    "express": "4.18.2",
+    "uuid": "9.0.0"
+  },
+  "author": "David Borja-Jakobsen",
+  "license": "ISC"
+}
