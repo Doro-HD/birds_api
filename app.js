@@ -40,7 +40,7 @@ app.get('/birds', (req, res) => {
     birds = birds.filter(bird => bird.birdFamily === birdFamily)
   }
   
-  res.send(birds)
+  res.send({data: birds})
 })
 
 app.get('/birds/:id', (req, res) => {
@@ -52,7 +52,7 @@ app.get('/birds/:id', (req, res) => {
     status = 404
   }
   
-  res.status(status).send(bird)
+  res.status(status).send({data: bird})
 })
 
-app.listen(8080)
+app.listen(8080, () => console.log('Listening on port 8080'))
