@@ -1,34 +1,34 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
+let autoIncrementNextValue = 1
+
 const birdsDB = [
   {
-    id: '1',
+    id: autoIncrementNextValue++,
     name: 'Aquatic warbler',
     scientificName: 'Acrocephalus paludicola',
-    birdFamily: 'Warblers',
-    wingSpand: 16.5
+    birdFamily: 'Warblers'
   },
   {
-    id: '2',
+    id: autoIncrementNextValue++,
     name: 'Segde warbler',
     scientificName: 'Acrocephalus schoenobaenus',
-    birdFamily: 'Warblers',
-    wingSpand: 17    
+    birdFamily: 'Warblers'
   },
   {
-    id: '3',
+    id: autoIncrementNextValue++,
     name: 'Arctic skua',
     scientificName: 'Stercorarius parasiticus',
-    birdFamily: 'Skuas',
-    wingSpand: 110
+    birdFamily: 'Skuas'
   },
   {
-    id: '4',
+    id: autoIncrementNextValue++,
     name: 'Long-tailed skua',
     scientificName: 'Stercorarius longicaudus',
-    birdFamily: 'Skuas',
-    wingSpand: 105
+    birdFamily: 'Skuas'
   }
 ]
 
@@ -43,9 +43,16 @@ app.get('/birds', (req, res) => {
   res.send({data: birds})
 })
 
+app.post('/birds', (req, res) => {
+  const bird = {id: autoIncrementNextValue++, ...req.body}
+  birdsDB.push(bird)
+
+  res.status(200).send(bird)
+})
+
 app.get('/birds/:id', (req, res) => {
   const id = req.params.id
-  const bird = birdsDB.find(bird => bird.id === id)  
+  const bird = birdsDB.find(bird => bird.id === Number(id))  
 
   let status = 200
   if (bird === undefined) {
