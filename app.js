@@ -62,4 +62,41 @@ app.get('/birds/:id', (req, res) => {
   res.status(status).send({data: bird})
 })
 
+app.put('/birds/:id', (req, res) => {
+  const id = req.params.id
+  const birdIndex = birdsDB.findIndex(bird => bird.id === Number(id))
+  
+  const response = {message: 'Not found'}
+  let status = 404
+  if (birdIndex >= 0) {
+    status = 200
+
+    const birdFound = birdsDB[birdIndex]
+    const birdResponse = {...req.body, id: birdFound.id}
+    
+    birdsDB[birdIndex] = birdResponse
+
+    response.message = 'Succes'
+    response.data = birdResponse
+  }
+
+  res.status(status).send(response)
+})
+
+app.delete('/birds/:id', (req, res) => {
+  const id = req.params.id
+  const birdIndex = birdsDB.findIndex(bird => bird.id === Number(id))
+
+  const response = {message: 'Not found'}
+  let status = 400
+  if (birdIndex >= 0) {
+    status = 200
+    response.message = 'Success'
+
+    birdsDB.splice(birdIndex, 1)
+  }
+
+  res.status(status).send(response)
+})
+
 app.listen(8080, () => console.log('Listening on port 8080'))
