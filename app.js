@@ -5,27 +5,31 @@ app.use(express.json())
 
 let autoIncrementNextValue = 1
 
+function autoIncrement() {
+  return autoIncrementNextValue++
+}
+
 const birdsDB = [
   {
-    id: autoIncrementNextValue++,
+    id: autoIncrement(),
     name: 'Aquatic warbler',
     scientificName: 'Acrocephalus paludicola',
     birdFamily: 'Warblers'
   },
   {
-    id: autoIncrementNextValue++,
+    id: autoIncrement(),
     name: 'Segde warbler',
     scientificName: 'Acrocephalus schoenobaenus',
     birdFamily: 'Warblers'
   },
   {
-    id: autoIncrementNextValue++,
+    id: autoIncrement(),
     name: 'Arctic skua',
     scientificName: 'Stercorarius parasiticus',
     birdFamily: 'Skuas'
   },
   {
-    id: autoIncrementNextValue++,
+    id: autoIncrement(),
     name: 'Long-tailed skua',
     scientificName: 'Stercorarius longicaudus',
     birdFamily: 'Skuas'
@@ -44,10 +48,29 @@ app.get('/birds', (req, res) => {
 })
 
 app.post('/birds', (req, res) => {
-  const bird = {id: autoIncrementNextValue++, ...req.body}
-  birdsDB.push(bird)
+  const body = req.body
+  let bird = null
+  let message = "Request body did not match specification"
 
-  res.status(200).send(bird)
+  let status = 400
+  if (
+    body.name &&
+    body.scientificName &&
+    body.birdFamily
+  ) {
+    message = 'Success'
+    status = 201
+    bird = {
+      id: autoIncrement()
+      name: body.name,
+      scientificName: body.scientificName,
+      birdFamily: body.birdFamily
+    }
+
+    birdsDB.push(bird)
+  }
+
+  res.status(status).send({message: message, data: bird})
 })
 
 app.get('/birds/:id', (req, res) => {
@@ -64,15 +87,38 @@ app.get('/birds/:id', (req, res) => {
 
 app.put('/birds/:id', (req, res) => {
   const id = req.params.id
-  const birdIndex = birdsDB.findIndex(bird => bird.id === Number(id))
+  const body = req.body
+
+  const response = {message: 'Request body did not match specification'}
+  let status = 400
+
+  let isRequestBodyValid = false
+  if (
+    body.name &&
+    body.scientificName &&
+    body.birdFamily
+    
+  ) {
+    isRequestBodyValid = true
+
+    response.message = 'Not found'
+    status = 404
+  }
   
-  const response = {message: 'Not found'}
-  let status = 404
-  if (birdIndex >= 0) {
+  const birdIndex = birdsDB.findIndex(bird => bird.id === Number(id))
+  if (
+    birdIndex >= 0 &&
+    isRequestBodyValid
+  ) {
     status = 200
 
     const birdFound = birdsDB[birdIndex]
-    const birdResponse = {...req.body, id: birdFound.id}
+    const birdResponse = {
+      id: birdFound.id,
+      name: body.name,
+      scientificName: body.scientificName,
+      birdFamily: body.birdFamily
+    }
     
     birdsDB[birdIndex] = birdResponse
 
