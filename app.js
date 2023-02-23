@@ -49,9 +49,8 @@ app.get('/birds', (req, res) => {
 
 app.post('/birds', (req, res) => {
   const body = req.body
-  let bird = null
-  let message = "Request body did not match specification"
 
+  const response = {message: "Request body did not match specification"}
   let status = 400
   if (
     body.name &&
@@ -61,28 +60,33 @@ app.post('/birds', (req, res) => {
     message = 'Success'
     status = 201
     bird = {
-      id: autoIncrement()
+      id: autoIncrement(),
       name: body.name,
       scientificName: body.scientificName,
       birdFamily: body.birdFamily
     }
 
     birdsDB.push(bird)
+    response.data = bird
   }
 
-  res.status(status).send({message: message, data: bird})
+  res.status(status).send(response)
 })
 
 app.get('/birds/:id', (req, res) => {
   const id = req.params.id
   const bird = birdsDB.find(bird => bird.id === Number(id))  
 
-  let status = 200
-  if (bird === undefined) {
-    status = 404
+  const response = {message: "Not found"}
+  let status = 404
+  if (bird !== undefined) {
+    status = 200
+
+    response.message = "Success"
+    response.data = bird
   }
   
-  res.status(status).send({data: bird})
+  res.status(status).send(response)
 })
 
 app.put('/birds/:id', (req, res) => {
@@ -134,7 +138,9 @@ app.delete('/birds/:id', (req, res) => {
   const birdIndex = birdsDB.findIndex(bird => bird.id === Number(id))
 
   const response = {message: 'Not found'}
-  let status = 400
+
+  response.message = "Success"
+  let status = 404
   if (birdIndex >= 0) {
     status = 200
     response.message = 'Success'
